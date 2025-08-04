@@ -1,9 +1,8 @@
 let topics = [];
 let links = {};
 
-// Load data and initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if backup restore prompt already shown/handled
+  // Restore prompt: only show once after extension install/update
   chrome.storage.sync.get('backup_restored', (flags) => {
     if (!flags.backup_restored) {
       getLatestBackup((backup) => {
@@ -13,29 +12,31 @@ document.addEventListener('DOMContentLoaded', () => {
               location.reload();
             });
           } else {
-            chrome.storage.sync.set({ backup_restored: true }); // User declined, don't prompt again
+            chrome.storage.sync.set({ backup_restored: true });
+            loadData();
           }
+        } else {
+          loadData();
         }
       });
     } else {
-      // If already restored or declined, just load data normally
       loadData();
     }
   });
 
-  // Add topic button & Enter key support
+  // Add topic
   document.getElementById('add-topic').onclick = addTopic;
   document.getElementById('topic-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') addTopic();
   });
 
-  // Add link button & Enter key support
+  // Add link
   document.getElementById('add-link').onclick = addLink;
   document.getElementById('link-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') addLink();
   });
 
-  // Back to topics button
+  // Back to topics
   document.getElementById('back-to-topics').onclick = () => {
     document.getElementById('links-section').style.display = 'none';
     document.getElementById('topic-input').focus();
@@ -59,7 +60,6 @@ function addTopic() {
   const topic = input.value.trim();
   if (!topic) return alert('Please enter a topic name.');
   if (topics.includes(topic)) return alert('Topic already exists.');
-
   topics.push(topic);
   links[topic] = [];
   saveData();
@@ -121,11 +121,9 @@ function renderLinks(topic) {
   const linkList = document.getElementById('link-list');
   linkList.innerHTML = '';
   if (!links[topic]) links[topic] = [];
-
   links[topic].forEach((link, idx) => {
     const li = document.createElement('li');
 
-    // Favicon image
     const faviconUrl = 'https://www.google.com/s2/favicons?sz=32&domain_url=' + encodeURIComponent(link);
     const favImg = document.createElement('img');
     favImg.src = faviconUrl;
@@ -133,14 +131,12 @@ function renderLinks(topic) {
     favImg.style.marginRight = '8px';
     favImg.style.borderRadius = '3px';
 
-    // Link anchor
     const a = document.createElement('a');
     a.href = link;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.textContent = getLinkName(link);
 
-    // Delete button
     const delBtn = document.createElement('button');
     delBtn.textContent = 'Delete';
     delBtn.title = 'Delete this link';
@@ -163,7 +159,6 @@ function addLink() {
   const input = document.getElementById('link-input');
   const url = input.value.trim();
   const currentTopic = document.getElementById('current-topic').textContent;
-
   if (!url) return alert('Please enter a link.');
   if (!currentTopic) return alert('Please select a topic first.');
   if (!isValidUrl(url)) return alert('Please enter a valid URL (starting with http:// or https://)');
@@ -207,7 +202,6 @@ function isValidUrl(string) {
 }
 
 // Backup functions
-
 function saveBackup() {
   chrome.storage.sync.get(['topics', 'links'], (data) => {
     if (data.topics && data.links) {

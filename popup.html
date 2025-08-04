@@ -14,7 +14,7 @@
 
   <section style="margin-bottom:10px;">
     <label for="topic-input" style="font-weight:600;font-size:15px;">Add Topic</label><br />
-    <input id="topic-input" type="text" placeholder="e.g. Anime, Games, Movies" aria-label="Add Topic" />
+    <input id="topic-input" type="text" placeholder="e.g. Anime, Games , Movies" aria-label="Add Topic" />
     <button id="add-topic" aria-label="Add Topic Button">Add</button>
     <ul id="topic-list" aria-live="polite" aria-relevant="all"></ul>
   </section>
@@ -30,6 +30,13 @@
     <button id="add-link" aria-label="Add Link Button">Add Link</button>
 
     <ul id="link-list" aria-live="polite" aria-relevant="all" style="margin-top: 10px;"></ul>
+
+    <!-- Import/Export Backup Controls -->
+    <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+      <button id="export-data" aria-label="Export Backup">Export Backup</button>
+      <input type="file" id="import-file" style="display:none;" />
+      <button id="import-data" aria-label="Import Backup">Import Backup</button>
+    </div>
   </section>
 
   <footer style="margin-top:22px;text-align:center;font-size:13px;color:#7886bd;">
