@@ -7,18 +7,25 @@ html, body {
     padding: 0;
     box-sizing: border-box;
 }
+
 body {
     font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
     background: linear-gradient(135deg, #73a5ff 0%, #5477f5 100%);
     color: #27314f;
     padding: 16px 20px 20px 20px;
 }
+
+h2, h3, label, button {
+    text-transform: uppercase;
+}
+
 .header img {
     width: 32px;
     height: 32px;
     border-radius: 8px;
     box-shadow: 0 2px 8px #799cff3d;
 }
+
 h2, h3 {
     margin-top: 0.7em;
     margin-bottom: 0.4em;
@@ -26,6 +33,7 @@ h2, h3 {
     color: #232946;
     letter-spacing: 0.03em;
 }
+
 input[type="text"] {
     width: 68%;
     padding: 11px 12px;
@@ -39,10 +47,12 @@ input[type="text"] {
     margin-bottom: 13px;
     transition: box-shadow 0.23s, background 0.18s;
 }
+
 input[type="text"]:focus {
     background: rgba(255,255,255,0.95);
     box-shadow: 0 2px 18px 0 #a4bcfdbe;
 }
+
 button {
     padding: 9px 16px;
     background: linear-gradient(90deg, #f857a6 0%, #ff5858 100%);
@@ -55,16 +65,19 @@ button {
     box-shadow: 0 2px 8px 0 rgba(248,87,166,0.12);
     transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
 }
+
 button:hover {
     background: linear-gradient(90deg, #ff5858 0%, #f857a6 100%);
     transform: translateY(-2px) scale(1.04);
     box-shadow: 0 6px 20px 0 rgba(248,87,166,0.19);
 }
+
 ul {
     list-style: none;
     padding: 0;
     margin: 0 0 12px 0;
 }
+
 li {
     margin-bottom: 11px;
     display: flex;
@@ -76,10 +89,12 @@ li {
     transition: box-shadow 0.21s, background 0.18s;
     backdrop-filter: blur(2px);
 }
+
 li:hover {
     background: rgba(120,160,255,0.14);
     box-shadow: 0 4px 22px rgba(68,95,251,0.17);
 }
+
 li a {
     flex: 1;
     color: #3b82f6;
@@ -89,10 +104,12 @@ li a {
     word-break: break-all;
     transition: color 0.13s;
 }
+
 li a:hover {
     color: #f857a6;
     text-decoration: underline;
 }
+
 li button {
     padding: 6px 10px;
     margin-left: 9px;
@@ -106,10 +123,12 @@ li button {
     cursor: pointer;
     transition: background 0.3s, color 0.3s;
 }
+
 li button:hover {
     background: linear-gradient(90deg, #ff5858 0%, #fdeec7 100%);
     color: #ff5858;
 }
+
 #links-section {
     background: rgba(255,255,255,0.79);
     border-radius: 14px;
@@ -119,27 +138,32 @@ li button:hover {
     backdrop-filter: blur(3px);
     border: 1px solid #e3e7fa;
 }
+
 footer {
     margin-top: 22px;
     text-align: center;
     font-size: 13px;
     color: #7886bd;
 }
+
 ::-webkit-scrollbar {
     width: 7px;
     background: rgba(170,190,245,0.16);
     border-radius: 5px;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #bad3ff;
     border-radius: 5px;
 }
+
 @media (max-width: 420px) {
     body {
         width: 99vw;
         padding: 16px 12px 12px 12px;
     }
 }
+
 *, *:before, *:after {
     box-sizing: border-box;
 }

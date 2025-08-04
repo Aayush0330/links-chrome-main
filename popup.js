@@ -3,7 +3,7 @@ let links = {};
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
-  // Load data and prompt restore backup once if available
+  // Prompt restore backup only once
   chrome.storage.sync.get('backup_restored', (flags) => {
     if (!flags.backup_restored) {
       getLatestBackup((backup) => {
@@ -25,30 +25,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Event listeners
+  // Add topic / enter key
   document.getElementById('add-topic').onclick = addTopic;
   document.getElementById('topic-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') addTopic();
   });
 
+  // Add link / enter key
   document.getElementById('add-link').onclick = addLink;
   document.getElementById('link-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') addLink();
   });
 
+  // Back button
   document.getElementById('back-to-topics').onclick = () => {
     document.getElementById('links-section').style.display = 'none';
     document.getElementById('topic-input').focus();
   };
 
-  // Import/export backup event handlers
+  // Import/export events
   document.getElementById('export-data').onclick = exportData;
-  document.getElementById('import-data').onclick = () =>
-    document.getElementById('import-file').click();
+  document.getElementById('import-data').onclick = () => document.getElementById('import-file').click();
   document.getElementById('import-file').addEventListener('change', importData);
 });
 
-// Load saved topics and links
 function loadData() {
   chrome.storage.sync.get(['topics', 'links'], data => {
     topics = data.topics || [];
@@ -58,12 +58,10 @@ function loadData() {
   });
 }
 
-// Save current data and create backup
 function saveData() {
   chrome.storage.sync.set({ topics, links }, saveBackup);
 }
 
-// Add a new topic
 function addTopic() {
   const input = document.getElementById('topic-input');
   const topic = input.value.trim();
@@ -77,7 +75,6 @@ function addTopic() {
   input.value = '';
 }
 
-// Display all topics
 function renderTopics() {
   const list = document.getElementById('topic-list');
   list.innerHTML = '';
@@ -121,7 +118,6 @@ function renderTopics() {
   });
 }
 
-// Show links of a selected topic
 function showLinks(topic) {
   const linksSection = document.getElementById('links-section');
   linksSection.style.display = 'block';
@@ -129,7 +125,6 @@ function showLinks(topic) {
   renderLinks(topic);
 }
 
-// Render all links for a topic with favicons
 function renderLinks(topic) {
   const linkList = document.getElementById('link-list');
   linkList.innerHTML = '';
@@ -169,7 +164,6 @@ function renderLinks(topic) {
   });
 }
 
-// Add a new link to current topic
 function addLink() {
   const input = document.getElementById('link-input');
   const url = input.value.trim();
@@ -187,7 +181,6 @@ function addLink() {
   input.value = '';
 }
 
-// Map URL to easy-readable site names
 function getLinkName(url) {
   const linkNames = {
     'steam': 'Steam',
@@ -209,7 +202,6 @@ function getLinkName(url) {
   }
 }
 
-// Validate URL format
 function isValidUrl(string) {
   try {
     const url = new URL(string);
@@ -219,7 +211,7 @@ function isValidUrl(string) {
   }
 }
 
-// Save backup with timestamp in storage
+// Backup - Save backup in chrome.storage.sync with timestamp key
 function saveBackup() {
   chrome.storage.sync.get(['topics', 'links'], (data) => {
     if (data.topics && data.links) {
@@ -230,7 +222,7 @@ function saveBackup() {
   });
 }
 
-// Get latest backup from storage
+// Backup - Get latest backup saved
 function getLatestBackup(callback) {
   chrome.storage.sync.get(null, (allData) => {
     const backups = Object.keys(allData)
@@ -243,4 +235,41 @@ function getLatestBackup(callback) {
       callback(null);
     }
   });
+}
+
+// Export backup - Download single full JSON file
+function exportData() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ topics, links }));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute('href', dataStr);
+  dlAnchorElem.setAttribute('download', 'link_organizer_backup.json');
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  dlAnchorElem.remove();
+}
+
+// Import backup - Load from selected JSON file
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const importedData = JSON.parse(e.target.result);
+      if (importedData.topics && importedData.links) {
+        topics = importedData.topics;
+        links = importedData.links;
+        saveData();
+        renderTopics();
+        alert('Backup imported successfully.');
+      } else {
+        alert('Invalid backup file.');
+      }
+    } catch {
+      alert('Failed to parse backup file.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';  // Clear input for subsequent imports
 }
