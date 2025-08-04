@@ -1,8 +1,9 @@
 let topics = [];
 let links = {};
 
+// Initialization
 document.addEventListener('DOMContentLoaded', () => {
-  // Restore prompt: only show once after extension install/update
+  // Load data and prompt restore backup once if available
   chrome.storage.sync.get('backup_restored', (flags) => {
     if (!flags.backup_restored) {
       getLatestBackup((backup) => {
@@ -24,42 +25,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Add topic
+  // Event listeners
   document.getElementById('add-topic').onclick = addTopic;
   document.getElementById('topic-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') addTopic();
   });
 
-  // Add link
   document.getElementById('add-link').onclick = addLink;
   document.getElementById('link-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') addLink();
   });
 
-  // Back to topics
   document.getElementById('back-to-topics').onclick = () => {
     document.getElementById('links-section').style.display = 'none';
     document.getElementById('topic-input').focus();
   };
+
+  // Import/export backup event handlers
+  document.getElementById('export-data').onclick = exportData;
+  document.getElementById('import-data').onclick = () =>
+    document.getElementById('import-file').click();
+  document.getElementById('import-file').addEventListener('change', importData);
 });
 
+// Load saved topics and links
 function loadData() {
   chrome.storage.sync.get(['topics', 'links'], data => {
     topics = data.topics || [];
     links = data.links || {};
     renderTopics();
+    document.getElementById('links-section').style.display = 'none';
   });
 }
 
+// Save current data and create backup
 function saveData() {
   chrome.storage.sync.set({ topics, links }, saveBackup);
 }
 
+// Add a new topic
 function addTopic() {
   const input = document.getElementById('topic-input');
   const topic = input.value.trim();
   if (!topic) return alert('Please enter a topic name.');
   if (topics.includes(topic)) return alert('Topic already exists.');
+
   topics.push(topic);
   links[topic] = [];
   saveData();
@@ -67,6 +77,7 @@ function addTopic() {
   input.value = '';
 }
 
+// Display all topics
 function renderTopics() {
   const list = document.getElementById('topic-list');
   list.innerHTML = '';
@@ -110,6 +121,7 @@ function renderTopics() {
   });
 }
 
+// Show links of a selected topic
 function showLinks(topic) {
   const linksSection = document.getElementById('links-section');
   linksSection.style.display = 'block';
@@ -117,10 +129,12 @@ function showLinks(topic) {
   renderLinks(topic);
 }
 
+// Render all links for a topic with favicons
 function renderLinks(topic) {
   const linkList = document.getElementById('link-list');
   linkList.innerHTML = '';
   if (!links[topic]) links[topic] = [];
+
   links[topic].forEach((link, idx) => {
     const li = document.createElement('li');
 
@@ -155,10 +169,12 @@ function renderLinks(topic) {
   });
 }
 
+// Add a new link to current topic
 function addLink() {
   const input = document.getElementById('link-input');
   const url = input.value.trim();
   const currentTopic = document.getElementById('current-topic').textContent;
+
   if (!url) return alert('Please enter a link.');
   if (!currentTopic) return alert('Please select a topic first.');
   if (!isValidUrl(url)) return alert('Please enter a valid URL (starting with http:// or https://)');
@@ -171,6 +187,7 @@ function addLink() {
   input.value = '';
 }
 
+// Map URL to easy-readable site names
 function getLinkName(url) {
   const linkNames = {
     'steam': 'Steam',
@@ -192,6 +209,7 @@ function getLinkName(url) {
   }
 }
 
+// Validate URL format
 function isValidUrl(string) {
   try {
     const url = new URL(string);
@@ -201,7 +219,7 @@ function isValidUrl(string) {
   }
 }
 
-// Backup functions
+// Save backup with timestamp in storage
 function saveBackup() {
   chrome.storage.sync.get(['topics', 'links'], (data) => {
     if (data.topics && data.links) {
@@ -212,6 +230,7 @@ function saveBackup() {
   });
 }
 
+// Get latest backup from storage
 function getLatestBackup(callback) {
   chrome.storage.sync.get(null, (allData) => {
     const backups = Object.keys(allData)
