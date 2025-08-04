@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Link Organizer",
+  "description": "Organize and quickly access your favorite themed links in one place.",
+  "version": "1.0",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
